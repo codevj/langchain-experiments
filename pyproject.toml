@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "langchain-experiments"
+version = "0.1.0"
+description = "A project utilizing LangChain and related libraries."
+authors = ["VJ <v-j@live.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.8"
+langchain = "^0.0.1"  # Replace with the latest version available on PyPI
+openai = "^0.27.10"  # For OpenAI API integration
+psycopg2 = "^2.9.6"  # PostgreSQL support
+tiktoken = "^0.4.0"  # Tokenization for LangChain
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+black = "^23.0"
+flake8 = "^6.0"
+
+[tool.poetry.scripts]
+create-experiment = "scripts.create_experiment:create_experiment"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
