@@ -1,30 +1,31 @@
 import os
+import json
+from pathlib import Path
 
 def create_experiment():
-    """Create a new experiment folder structure."""
+    """Automates the creation of a new experiment folder structure with a Jupyter notebook."""
     experiment_name = input("Enter the name of the new experiment: ").strip()
 
     if not experiment_name:
         print("Experiment name cannot be empty.")
         return
 
-    base_dir = os.path.join("langchain_experiments", experiment_name)
+    # Automatically detect the parent directory of `scripts` folder
+    scripts_dir = Path(__file__).parent
+    parent_dir = scripts_dir.parent  # The root project directory
+    experiments_dir = parent_dir / "langchain_experiments"
 
-    if os.path.exists(base_dir):
+    base_dir = experiments_dir / experiment_name
+    if base_dir.exists():
         print(f"Experiment '{experiment_name}' already exists.")
         return
 
-    # Create experiment directories
+    # Create experiment directories and files
     os.makedirs(base_dir)
-    os.makedirs(os.path.join("tests", experiment_name))
+    os.makedirs(parent_dir / "tests" / experiment_name)
 
-    # Create __init__.py files
-    open(os.path.join(base_dir, "__init__.py"), "w").close()
-    open(os.path.join("tests", experiment_name, "__init__.py"), "w").close()
-
-    # Create default experiment.py file
-    experiment_file = os.path.join(base_dir, "experiment.py")
-    with open(experiment_file, "w") as f:
+    (base_dir / "__init__.py").touch()
+    with open(base_dir / "experiment.py", "w") as f:
         f.write(f"""# Experiment: {experiment_name}
 
 def run_experiment():
@@ -34,9 +35,7 @@ if __name__ == "__main__":
     run_experiment()
 """)
 
-    # Create default test file
-    test_file = os.path.join("tests", experiment_name, "test_experiment.py")
-    with open(test_file, "w") as f:
+    with open(parent_dir / "tests" / experiment_name / "test_experiment.py", "w") as f:
         f.write(f"""# Unit test for {experiment_name}
 
 from langchain_experiments.{experiment_name}.experiment import run_experiment
@@ -45,5 +44,44 @@ def test_run_experiment():
     assert run_experiment() is None  # Check for successful execution
 """)
 
-    print(f"Experiment '{experiment_name}' created successfully at '{base_dir}'.")
+    # Create Jupyter notebook
+    notebook_path = base_dir / "experiment.ipynb"
+    notebook_content = {
+        "cells": [
+            {
+                "cell_type": "markdown",
+                "metadata": {},
+                "source": [f"# Experiment: {experiment_name}\n\nThis notebook contains notes, results, and code for the experiment."]
+            },
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                "metadata": {},
+                "outputs": [],
+                "source": ["# Import necessary libraries\nfrom langchain.llms import OpenAI\n\n# Placeholder function\nprint('Hello from the Jupyter notebook')"]
+            }
+        ],
+        "metadata": {
+            "kernelspec": {
+                "display_name": "Python 3",
+                "language": "python",
+                "name": "python3"
+            },
+            "language_info": {
+                "codemirror_mode": {"name": "ipython", "version": 3},
+                "file_extension": ".py",
+                "mimetype": "text/x-python",
+                "name": "python",
+                "nbconvert_exporter": "python",
+                "pygments_lexer": "ipython3",
+                "version": "3.11"
+            }
+        },
+        "nbformat": 4,
+        "nbformat_minor": 5
+    }
 
+    with open(notebook_path, "w") as f:
+        json.dump(notebook_content, f)
+
+    print(f"Experiment '{experiment_name}' created successfully with a Jupyter notebook at '{base_dir}'!")
