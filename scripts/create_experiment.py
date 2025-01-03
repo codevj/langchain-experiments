@@ -1,6 +1,12 @@
 import os
+import re
+import sys
 import json
-from pathlib import Path
+
+def is_valid_experiment_name(name):
+    """Checks if the experiment name is a valid Python identifier."""
+    return bool(re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", name))
+
 
 def create_experiment():
     """Automates the creation of a new experiment folder structure with a Jupyter notebook."""
@@ -8,24 +14,26 @@ def create_experiment():
 
     if not experiment_name:
         print("Experiment name cannot be empty.")
-        return
+        sys.exit(1)
 
-    # Automatically detect the parent directory of `scripts` folder
-    scripts_dir = Path(__file__).parent
-    parent_dir = scripts_dir.parent  # The root project directory
-    experiments_dir = parent_dir / "langchain_experiments"
+    if not is_valid_experiment_name(experiment_name):
+        print(f"Invalid experiment name '{experiment_name}'. It must be a valid Python identifier.")
+        print("The name should:")
+        print("  - Start with a letter or underscore.")
+        print("  - Only contain letters, digits, and underscores.")
+        sys.exit(1)
 
-    base_dir = experiments_dir / experiment_name
-    if base_dir.exists():
+    base_dir = os.path.join("langchain_experiments", experiment_name)
+    if os.path.exists(base_dir):
         print(f"Experiment '{experiment_name}' already exists.")
-        return
+        sys.exit(1)
 
     # Create experiment directories and files
     os.makedirs(base_dir)
-    os.makedirs(parent_dir / "tests" / experiment_name)
+    os.makedirs(os.path.join("tests", experiment_name))
 
-    (base_dir / "__init__.py").touch()
-    with open(base_dir / "experiment.py", "w") as f:
+    open(os.path.join(base_dir, "__init__.py"), "w").close()
+    with open(os.path.join(base_dir, "experiment.py"), "w") as f:
         f.write(f"""# Experiment: {experiment_name}
 
 def run_experiment():
@@ -35,7 +43,7 @@ if __name__ == "__main__":
     run_experiment()
 """)
 
-    with open(parent_dir / "tests" / experiment_name / "test_experiment.py", "w") as f:
+    with open(os.path.join("tests", experiment_name, "test_experiment.py"), "w") as f:
         f.write(f"""# Unit test for {experiment_name}
 
 from langchain_experiments.{experiment_name}.experiment import run_experiment
@@ -45,7 +53,7 @@ def test_run_experiment():
 """)
 
     # Create Jupyter notebook
-    notebook_path = base_dir / "experiment.ipynb"
+    notebook_path = os.path.join(base_dir, "experiment.ipynb")
     notebook_content = {
         "cells": [
             {
@@ -84,4 +92,4 @@ def test_run_experiment():
     with open(notebook_path, "w") as f:
         json.dump(notebook_content, f)
 
-    print(f"Experiment '{experiment_name}' created successfully with a Jupyter notebook at '{base_dir}'!")
+    print(f"Experiment '{experiment_name}' created successfully with a Jupyter notebook!")
