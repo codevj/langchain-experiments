@@ -1,38 +1,33 @@
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "langchain-experiments"
 version = "0.1.0"
 description = "A project utilizing LangChain and related libraries."
-authors = ["VJ <v-j@live.com>"]
+authors = [ "VJ <v-j@live.com>",]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 cohere = "^5.13.5"
 ipykernel = "^6.29.5"
-langchain = "^0.1.0"  # Replace with the latest version available on PyPI
-openai = "^0.27.10"  # For OpenAI API integration
-psycopg2 = "^2.9.6"  # PostgreSQL support
+langchain = "^0.1.0"
+openai = "^0.27.10"
+psycopg2 = "^2.9.6"
 python = "3.11.8"
-tiktoken = "^0.4.0"  # Tokenization for LangChain
-
-[tool.poetry.group.dev.dependencies]
-poethepoet = "^0.32.0"
-toml = "^0.10.2"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+tiktoken = "^0.4.0"
 
 [tool.poe.tasks]
 create_experiment = "python scripts/create_experiment.py"
 register_kernel = "python -m ipykernel install --user --name=langchain-experiments --display-name 'Python (langchain-experiments)'"
 change_to_notebook_dir = "cd langchain_experiments"
 launch_jupyter = "jupyter notebook"
-start_notebook = [
-    "register_kernel",
-    "change_to_notebook_dir",
-    "launch_jupyter"
-]
+start_notebook = [ "register_kernel", "change_to_notebook_dir", "launch_jupyter",]
 pytest = "pytest"
+hello_world_run = "python langchain_experiments/hello_world/hello_world_script.py"
 
-
+[tool.poetry.group.dev.dependencies]
+poethepoet = "^0.32.0"
+toml = "^0.10.2"
