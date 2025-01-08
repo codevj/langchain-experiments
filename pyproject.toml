@@ -15,10 +15,24 @@ psycopg2 = "^2.9.6"  # PostgreSQL support
 python = "3.11.8"
 tiktoken = "^0.4.0"  # Tokenization for LangChain
 
-[tool.poetry.scripts]
-create-experiment = "scripts.create_experiment:create_experiment"
-start-notebook = "scripts.start_jupyter:start_jupyter"
+[tool.poetry.group.dev.dependencies]
+poethepoet = "^0.32.0"
+toml = "^0.10.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+create_experiment = "python scripts/create_experiment.py"
+register_kernel = "python -m ipykernel install --user --name=langchain-experiments --display-name 'Python (langchain-experiments)'"
+change_to_notebook_dir = "cd langchain_experiments"
+launch_jupyter = "jupyter notebook"
+start_notebook = [
+    "register_kernel",
+    "change_to_notebook_dir",
+    "launch_jupyter"
+]
+pytest = "pytest"
+
+
